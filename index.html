@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BRÛLÉ — Coffee House</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Bebas+Neue&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --espresso: #1a0f08;
+      --roast: #3b1f0f;
+      --caramel: #c47c2b;
+      --cream: #f5e9d3;
+      --milk: #fdf6ec;
+      --ash: #6b5c4e;
+      --steam: rgba(245, 233, 211, 0.06);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--espresso);
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* Custom cursor */
+    .cursor {
+      position: fixed;
+      width: 12px; height: 12px;
+      background: var(--caramel);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s ease, width 0.3s ease, height 0.3s ease, opacity 0.3s;
+      mix-blend-mode: screen;
+    }
+    .cursor-ring {
+      position: fixed;
+      width: 36px; height: 36px;
+      border: 1px solid var(--caramel);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: transform 0.18s ease, width 0.3s, height 0.3s, opacity 0.3s;
+      opacity: 0.5;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 28px 56px;
+      background: linear-gradient(to bottom, rgba(26,15,8,0.95), transparent);
+    }
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      letter-spacing: 0.18em;
+      color: var(--caramel);
+    }
+    .nav-links {
+      display: flex; gap: 44px; list-style: none;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--cream);
+      font-size: 0.78rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      opacity: 0.7;
+      transition: opacity 0.25s, color 0.25s;
+    }
+    .nav-links a:hover { opacity: 1; color: var(--caramel); }
+
+    /* HERO */
+    .hero {
+      position: relative;
+      height: 100vh;
+      display: flex; align-items: flex-end;
+      padding: 0 56px 80px;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 70% 60% at 60% 40%, rgba(196,124,43,0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 50% at 80% 80%, rgba(59,31,15,0.9) 0%, transparent 60%),
+        linear-gradient(160deg, #2a1508 0%, #0e0704 60%, #1a0f08 100%);
+    }
+    .hero-grain {
+      position: absolute; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: 0.35;
+      pointer-events: none;
+    }
+    .hero-ring {
+      position: absolute;
+      width: 520px; height: 520px;
+      border: 1px solid rgba(196,124,43,0.12);
+      border-radius: 50%;
+      top: 50%; left: 62%;
+      transform: translate(-50%, -50%);
+      animation: slowSpin 30s linear infinite;
+    }
+    .hero-ring2 {
+      position: absolute;
+      width: 700px; height: 700px;
+      border: 1px solid rgba(196,124,43,0.06);
+      border-radius: 50%;
+      top: 50%; left: 62%;
+      transform: translate(-50%, -50%);
+      animation: slowSpin 50s linear infinite reverse;
+    }
+    @keyframes slowSpin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+    .hero-coffee-icon {
+      position: absolute;
+      top: 50%; left: 62%;
+      transform: translate(-50%, -55%);
+      font-size: 9rem;
+      opacity: 0.08;
+      animation: float 6s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translate(-50%, -55%); }
+      50% { transform: translate(-50%, -60%); }
+    }
+
+    .hero-eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--caramel);
+      margin-bottom: 20px;
+      opacity: 0;
+      animation: fadeUp 1s 0.3s forwards;
+    }
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(4.5rem, 9vw, 9rem);
+      font-weight: 300;
+      line-height: 0.92;
+      color: var(--cream);
+      margin-bottom: 36px;
+      opacity: 0;
+      animation: fadeUp 1s 0.55s forwards;
+    }
+    .hero-title em {
+      font-style: italic;
+      color: var(--caramel);
+    }
+    .hero-sub {
+      font-size: 0.9rem;
+      color: var(--ash);
+      max-width: 340px;
+      line-height: 1.8;
+      margin-bottom: 48px;
+      opacity: 0;
+      animation: fadeUp 1s 0.8s forwards;
+    }
+    .hero-actions {
+      display: flex; gap: 24px; align-items: center;
+      opacity: 0;
+      animation: fadeUp 1s 1s forwards;
+    }
+    .btn-primary {
+      padding: 16px 44px;
+      background: var(--caramel);
+      color: var(--espresso);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      text-decoration: none;
+      font-weight: 400;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .btn-primary:hover { background: var(--cream); transform: translateY(-2px); }
+    .btn-ghost {
+      font-size: 0.78rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--cream);
+      text-decoration: none;
+      opacity: 0.6;
+      transition: opacity 0.3s;
+      border-bottom: 1px solid rgba(245,233,211,0.3);
+      padding-bottom: 2px;
+    }
+    .btn-ghost:hover { opacity: 1; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-scroll {
+      position: absolute; right: 56px; bottom: 80px;
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+      opacity: 0.4;
+      font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase;
+      writing-mode: vertical-rl;
+      animation: fadeIn 2s 1.5s forwards; opacity: 0;
+    }
+    .hero-scroll-line {
+      width: 1px; height: 60px;
+      background: linear-gradient(to bottom, var(--caramel), transparent);
+      animation: lineGrow 2s 1.5s forwards; transform: scaleY(0); transform-origin: top;
+    }
+    @keyframes lineGrow { to { transform: scaleY(1); } }
+    @keyframes fadeIn { to { opacity: 0.4; } }
+
+    /* MARQUEE */
+    .marquee-wrap {
+      overflow: hidden;
+      border-top: 1px solid rgba(196,124,43,0.2);
+      border-bottom: 1px solid rgba(196,124,43,0.2);
+      padding: 18px 0;
+      background: rgba(196,124,43,0.04);
+    }
+    .marquee-track {
+      display: flex; gap: 0;
+      animation: marquee 18s linear infinite;
+      white-space: nowrap;
+    }
+    .marquee-item {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.05rem;
+      letter-spacing: 0.25em;
+      color: var(--caramel);
+      opacity: 0.7;
+      padding: 0 40px;
+      flex-shrink: 0;
+    }
+    .marquee-dot { color: var(--ash); opacity: 0.5; }
+    @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* SECTION COMMONS */
+    section { padding: 120px 56px; }
+    .section-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.38em;
+      text-transform: uppercase;
+      color: var(--caramel);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.8rem, 5vw, 5rem);
+      font-weight: 300;
+      line-height: 1.05;
+      color: var(--cream);
+    }
+    .section-title em { font-style: italic; color: var(--caramel); }
+
+    /* ABOUT */
+    .about {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+    .about-visual {
+      position: relative;
+      height: 540px;
+    }
+    .about-card {
+      position: absolute;
+      background: linear-gradient(135deg, rgba(59,31,15,0.9), rgba(26,15,8,0.95));
+      border: 1px solid rgba(196,124,43,0.15);
+      padding: 40px;
+      border-radius: 2px;
+    }
+    .about-card-main {
+      inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 20px;
+    }
+    .about-card-main .big-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 7rem;
+      color: var(--caramel);
+      line-height: 1;
+      opacity: 0.15;
+    }
+    .about-card-badge {
+      bottom: -20px; right: -20px;
+      width: 160px; height: 160px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center;
+      background: var(--caramel);
+      color: var(--espresso);
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-weight: 400;
+      line-height: 1.6;
+      animation: slowSpin 20s linear infinite;
+    }
+    .about-text { display: flex; flex-direction: column; gap: 28px; }
+    .about-text p {
+      font-size: 1rem;
+      line-height: 1.9;
+      color: var(--ash);
+      max-width: 460px;
+    }
+    .about-stats {
+      display: flex; gap: 40px; padding-top: 20px;
+      border-top: 1px solid rgba(196,124,43,0.15);
+    }
+    .stat-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.5rem;
+      color: var(--caramel);
+      font-weight: 300;
+    }
+    .stat-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ash);
+    }
+
+    /* MENU */
+    .menu-section { background: rgba(59,31,15,0.15); }
+    .menu-header {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      margin-bottom: 72px;
+    }
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+    .menu-item {
+      background: rgba(26,15,8,0.8);
+      border: 1px solid rgba(196,124,43,0.08);
+      padding: 48px 40px;
+      transition: background 0.4s, border-color 0.4s;
+      position: relative;
+      overflow: hidden;
+    }
+    .menu-item::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--caramel);
+      transform: scaleX(0);
+      transition: transform 0.4s ease;
+      transform-origin: left;
+    }
+    .menu-item:hover { background: rgba(59,31,15,0.5); border-color: rgba(196,124,43,0.25); }
+    .menu-item:hover::before { transform: scaleX(1); }
+    .menu-icon { font-size: 2rem; margin-bottom: 24px; opacity: 0.6; }
+    .menu-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      font-weight: 400;
+      color: var(--cream);
+      margin-bottom: 10px;
+    }
+    .menu-desc {
+      font-size: 0.82rem;
+      color: var(--ash);
+      line-height: 1.75;
+      margin-bottom: 24px;
+    }
+    .menu-price {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+      color: var(--caramel);
+      letter-spacing: 0.08em;
+    }
+
+    /* EXPERIENCE */
+    .experience {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 100px;
+      align-items: center;
+    }
+    .exp-list { display: flex; flex-direction: column; gap: 0; }
+    .exp-item {
+      display: flex; align-items: flex-start; gap: 28px;
+      padding: 32px 0;
+      border-bottom: 1px solid rgba(196,124,43,0.1);
+      transition: padding-left 0.3s;
+    }
+    .exp-item:hover { padding-left: 8px; }
+    .exp-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      color: var(--caramel);
+      opacity: 0.4;
+      min-width: 36px;
+      padding-top: 4px;
+    }
+    .exp-content h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 400;
+      color: var(--cream);
+      margin-bottom: 8px;
+    }
+    .exp-content p { font-size: 0.85rem; color: var(--ash); line-height: 1.75; }
+
+    .exp-visual {
+      position: relative;
+      height: 500px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .exp-circle {
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 40%, rgba(196,124,43,0.25), rgba(59,31,15,0.5) 60%, rgba(26,15,8,0.9));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .exp-circle::after {
+      content: '';
+      position: absolute; inset: 0;
+      border-radius: 50%;
+      border: 1px solid rgba(196,124,43,0.2);
+    }
+
+    /* HOURS */
+    .hours-section {
+      text-align: center;
+      background: linear-gradient(160deg, rgba(59,31,15,0.3), rgba(26,15,8,0.6));
+      border-top: 1px solid rgba(196,124,43,0.1);
+      border-bottom: 1px solid rgba(196,124,43,0.1);
+    }
+    .hours-grid {
+      display: flex;
+      justify-content: center;
+      gap: 80px;
+      margin-top: 60px;
+    }
+    .hours-block { text-align: center; }
+    .hours-day {
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--ash);
+      margin-bottom: 10px;
+    }
+    .hours-time {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      font-weight: 300;
+      color: var(--cream);
+    }
+    .hours-divider {
+      width: 1px;
+      background: rgba(196,124,43,0.2);
+      align-self: stretch;
+    }
+
+    /* CTA */
+    .cta-section {
+      text-align: center;
+      padding: 140px 56px;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(196,124,43,0.08) 0%, transparent 70%);
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .cta-section .section-title { margin-bottom: 24px; }
+    .cta-section p { color: var(--ash); font-size: 0.95rem; line-height: 1.85; margin-bottom: 48px; }
+    .cta-address {
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--caramel);
+      opacity: 0.7;
+      margin-top: 40px;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 48px 56px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-top: 1px solid rgba(196,124,43,0.1);
+    }
+    .footer-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: 0.2em;
+      color: var(--caramel);
+    }
+    .footer-copy {
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      color: var(--ash);
+      opacity: 0.5;
+    }
+    .footer-social { display: flex; gap: 24px; }
+    .footer-social a {
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ash);
+      text-decoration: none;
+      opacity: 0.5;
+      transition: opacity 0.25s, color 0.25s;
+    }
+    .footer-social a:hover { opacity: 1; color: var(--caramel); }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      nav { padding: 24px 28px; }
+      .nav-links { display: none; }
+      section { padding: 80px 28px; }
+      .hero { padding: 0 28px 64px; }
+      .hero-title { font-size: 3.5rem; }
+      .about, .experience { grid-template-columns: 1fr; gap: 48px; }
+      .menu-grid { grid-template-columns: 1fr; }
+      .hours-grid { flex-direction: column; gap: 36px; align-items: center; }
+      .hours-divider { display: none; }
+      footer { flex-direction: column; gap: 20px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">Brûlé</div>
+    <ul class="nav-links">
+      <li><a href="#menu">Menu</a></li>
+      <li><a href="#experience">Story</a></li>
+      <li><a href="#hours">Hours</a></li>
+      <li><a href="#contact">Visit</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grain"></div>
+    <div class="hero-ring"></div>
+    <div class="hero-ring2"></div>
+    <div class="hero-coffee-icon">☕</div>
+    <div style="position: relative; z-index: 2;">
+      <p class="hero-eyebrow">Est. 2019 — Single Origin Roasters</p>
+      <h1 class="hero-title">Ritual<br>in every<br><em>cup.</em></h1>
+      <p class="hero-sub">Slow-roasted, intentionally brewed. We believe the best coffee is an act of patience.</p>
+      <div class="hero-actions">
+        <a href="#menu" class="btn-primary">Explore Menu</a>
+        <a href="#experience" class="btn-ghost">Our Story</a>
+      </div>
+    </div>
+    <div class="hero-scroll">
+      <div class="hero-scroll-line"></div>
+      Scroll
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee-wrap">
+    <div class="marquee-track" id="marqueeTrack">
+      <span class="marquee-item">Single Origin</span><span class="marquee-item marquee-dot">·</span>
+      <span class="marquee-item">Cold Brew</span><span class="marquee-item marquee-dot">·</span>
+      <span class="marquee-item">Pour Over</span><span class="marquee-item marquee-dot">·</span>
+      <span class="marquee-item">Espresso Bar</span><span class="marquee-item marquee-dot">·</span>
+      <span class="marquee-item">Seasonal Blends</span><span class="marquee-item marquee-dot">·</span>
+      <span class="marquee-item">Slow Roast</span><span class="marquee-item marquee-dot">·</span>
+      <span class="marquee-item">Oat Milk</span><span class="marquee-item marquee-dot">·</span>
+      <span class="marquee-item">Specialty Pastries</span><span class="marquee-item marquee-dot">·</span>
+      <!-- Duplicate for seamless loop -->
+      <span class="marquee-item">Single Origin</span><span class="marquee-item marquee-dot">·</span>
+      <span class="marquee-item">Cold Brew</span><span class="marquee-item marquee-dot">·</span>
+      <span class="marquee-item">Pour Over</span><span class="marquee-item marquee-dot">·</span>
+      <span class="marquee-item">Espresso Bar</span><span class="marquee-item marquee-dot">·</span>
+      <span class="marquee-item">Seasonal Blends</span><span class="marquee-item marquee-dot">·</span>
+      <span class="marquee-item">Slow Roast</span><span class="marquee-item marquee-dot">·</span>
+      <span class="marquee-item">Oat Milk</span><span class="marquee-item marquee-dot">·</span>
+      <span class="marquee-item">Specialty Pastries</span><span class="marquee-item marquee-dot">·</span>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <section>
+    <div class="about">
+      <div class="about-visual">
+        <div class="about-card about-card-main">
+          <div class="big-num">12</div>
+          <p style="text-align:center; font-family:'Cormorant Garamond',serif; font-size:1.1rem; color:var(--ash); font-style:italic;">Origins we source from</p>
+        </div>
+        <div class="about-card about-card-badge">
+          Roasted<br>in-house<br>daily
+        </div>
+      </div>
+      <div class="about-text">
+        <p class="section-label">About Brûlé</p>
+        <h2 class="section-title">Where craft<br>meets <em>comfort.</em></h2>
+        <p>We started Brûlé with one obsession: what happens between the farm and your first sip. That journey — spanning continents, climates, and careful hands — is what we honour in every roast.</p>
+        <p>Our baristas are artisans. Our beans are traceable. Our space is designed for the kind of stillness that only a perfect cup can bring.</p>
+        <div class="about-stats">
+          <div>
+            <div class="stat-num">12K+</div>
+            <div class="stat-label">Cups served monthly</div>
+          </div>
+          <div>
+            <div class="stat-num">94°</div>
+            <div class="stat-label">Perfect brew temp</div>
+          </div>
+          <div>
+            <div class="stat-num">6 yrs</div>
+            <div class="stat-label">Of roasting craft</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MENU -->
+  <section class="menu-section" id="menu">
+    <div class="menu-header">
+      <div>
+        <p class="section-label">What we brew</p>
+        <h2 class="section-title">The <em>menu.</em></h2>
+      </div>
+      <a href="#" class="btn-ghost" style="margin-bottom:8px;">Full menu →</a>
+    </div>
+    <div class="menu-grid">
+      <div class="menu-item">
+        <div class="menu-icon">☕</div>
+        <div class="menu-name">Espresso</div>
+        <p class="menu-desc">A pure expression of our house blend. Intense, syrupy, with a lingering finish of dark chocolate.</p>
+        <div class="menu-price">₹180</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-icon">🥛</div>
+        <div class="menu-name">Flat White</div>
+        <p class="menu-desc">Silky microfoam over a double ristretto. A smaller, stronger, more intimate latte.</p>
+        <div class="menu-price">₹260</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-icon">🧊</div>
+        <div class="menu-name">Cold Brew</div>
+        <p class="menu-desc">Steeped for 18 hours. Smooth, low-acid, and undeniably refreshing over a single large ice cube.</p>
+        <div class="menu-price">₹290</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-icon">🍵</div>
+        <div class="menu-name">Pour Over</div>
+        <p class="menu-desc">Single origin, brewed to order. Let us guide you through today's offering from our rotating selection.</p>
+        <div class="menu-price">₹320</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-icon">🌿</div>
+        <div class="menu-name">Oat Matcha Latte</div>
+        <p class="menu-desc">Ceremonial grade matcha, frothed with barista oat milk. Earthy, creamy, and naturally energising.</p>
+        <div class="menu-price">₹310</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-icon">🥐</div>
+        <div class="menu-name">Seasonal Pastry</div>
+        <p class="menu-desc">Baked fresh each morning by our kitchen. Always changing, always worth asking about.</p>
+        <div class="menu-price">₹180</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="experience">
+    <div class="experience">
+      <div class="about-text">
+        <p class="section-label">The Brûlé way</p>
+        <h2 class="section-title">Slow is<br>the <em>point.</em></h2>
+        <div class="exp-list">
+          <div class="exp-item">
+            <div class="exp-num">01</div>
+            <div class="exp-content">
+              <h3>Sourced with intent</h3>
+              <p>We work directly with farmers across Ethiopia, Colombia, and Sumatra — long-term relationships built on fair trade and transparency.</p>
+            </div>
+          </div>
+          <div class="exp-item">
+            <div class="exp-num">02</div>
+            <div class="exp-content">
+              <h3>Roasted in-house</h3>
+              <p>Our roaster runs every morning at 6am. By the time you walk in, the beans in your cup were roasted hours earlier — never days.</p>
+            </div>
+          </div>
+          <div class="exp-item">
+            <div class="exp-num">03</div>
+            <div class="exp-content">
+              <h3>Brewed with precision</h3>
+              <p>Temperature, grind size, extraction time — every variable is dialled in. Every cup is tasted before it reaches you.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="exp-visual">
+        <div class="exp-circle">☕</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOURS -->
+  <section class="hours-section" id="hours">
+    <p class="section-label" style="text-align:center;">Come find us</p>
+    <h2 class="section-title" style="text-align:center;">We're <em>open.</em></h2>
+    <div class="hours-grid">
+      <div class="hours-block">
+        <div class="hours-day">Monday – Friday</div>
+        <div class="hours-time">7:00 – 21:00</div>
+      </div>
+      <div class="hours-divider"></div>
+      <div class="hours-block">
+        <div class="hours-day">Saturday</div>
+        <div class="hours-time">8:00 – 22:00</div>
+      </div>
+      <div class="hours-divider"></div>
+      <div class="hours-block">
+        <div class="hours-day">Sunday</div>
+        <div class="hours-time">9:00 – 20:00</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA / VISIT -->
+  <section class="cta-section" id="contact">
+    <p class="section-label">Find us</p>
+    <h2 class="section-title">Come in,<br><em>stay a while.</em></h2>
+    <p>No rush. No noise. Just good coffee and a table that's yours for as long as you need it.</p>
+    <a href="https://maps.google.com" class="btn-primary">Get Directions</a>
+    <p class="cta-address">12 Church Street, Indiranagar · Bengaluru, KA 560038</p>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">Brûlé</div>
+    <div class="footer-copy">© 2026 Brûlé Coffee House. All rights reserved.</div>
+    <div class="footer-social">
+      <a href="#">Instagram</a>
+      <a href="#">Twitter</a>
+      <a href="#">Reserve</a>
+    </div>
+  </footer>
+
+  <script>
+    // Custom cursor
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      cursor.style.left = mx + 'px';
+      cursor.style.top = my + 'px';
+    });
+
+    function animateRing() {
+      rx += (mx - rx) * 0.12;
+      ry += (my - ry) * 0.12;
+      ring.style.left = rx + 'px';
+      ring.style.top = ry + 'px';
+      requestAnimationFrame(animateRing);
+    }
+    animateRing();
+
+    document.querySelectorAll('a, button').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursor.style.width = '20px';
+        cursor.style.height = '20px';
+        ring.style.width = '56px';
+        ring.style.height = '56px';
+      });
+      el.addEventListener('mouseleave', () => {
+        cursor.style.width = '12px';
+        cursor.style.height = '12px';
+        ring.style.width = '36px';
+        ring.style.height = '36px';
+      });
+    });
+
+    // Intersection Observer for fade-in
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.menu-item, .exp-item, .about-stats').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(24px)';
+      el.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
+      observer.observe(el);
+    });
+  </script>
+</body>
+</html>
